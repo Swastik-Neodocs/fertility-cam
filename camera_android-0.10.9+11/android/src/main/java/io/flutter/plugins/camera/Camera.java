@@ -146,7 +146,9 @@ class Camera
 
   // new field added to retrieve exposure value in every frame while streaming
   private Integer latestExposureOffset = null;
-  private Boolean focusLocked = false;
+  
+  // new field added to retrieve focus state
+  private Integer focusState = null;
 
   /** Holds the current capture timeouts */
   private CaptureTimeoutsWrapper captureTimeouts;
@@ -281,6 +283,11 @@ class Camera
             Integer currentExposure = result.get(CaptureResult.CONTROL_AE_EXPOSURE_COMPENSATION);
             if (currentExposure != null) {
                 latestExposureOffset = currentExposure;
+            }
+
+            Integer afState = result.get(CaptureResult.CONTROL_AF_STATE);
+            if (afState != null) {
+                focusState = afState;
             }
         }
     };
@@ -1074,6 +1081,53 @@ class Camera
 
     this.setFocusMode(null, cameraFeatures.getAutoFocus().getValue());
   }
+
+
+  /**
+   * Retrieves the current focus state of the camera.
+   *
+   * @param result The MethodChannel.Result used to send back the focus state to Flutter.
+  */
+  public void getFocusState(@NonNull final Result result) {
+    if (focusState == null) {
+        result.error("getFocusStateFailed", "Focus state not available", null);
+        return;
+    }
+    
+    String stateDescription;
+    boolean isFocused = false;
+    
+    switch (focusState) {
+        case CaptureResult.CONTROL_AF_STATE_INACTIVE:
+            stateDescription = "inactive";
+            break;
+        case CaptureResult.CONTROL_AF_STATE_PASSIVE_SCAN:
+            stateDescription = "focusing1";
+            break;
+        case CaptureResult.CONTROL_AF_STATE_PASSIVE_FOCUSED:
+            stateDescription = "focused";
+            isFocused = true;
+            break;
+        case CaptureResult.CONTROL_AF_STATE_ACTIVE_SCAN:
+            stateDescription = "focusing2";
+            break;
+        case CaptureResult.CONTROL_AF_STATE_FOCUSED_LOCKED:
+            stateDescription = "focusedLocked";
+            isFocused = true;
+            break;
+        case CaptureResult.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED:
+            stateDescription = "notFocusedLocked";
+            break;
+        case CaptureResult.CONTROL_AF_STATE_PASSIVE_UNFOCUSED:
+            stateDescription = "unfocused";
+            break;
+        default:
+            stateDescription = "unknown";
+    }
+    
+    result.success(stateDescription);
+  }
+
 
   /**
    * Sets a new exposure offset from dart. From dart the offset comes as a double, like +1.3 or

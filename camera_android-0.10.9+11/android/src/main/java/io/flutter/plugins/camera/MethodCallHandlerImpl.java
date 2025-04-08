@@ -262,6 +262,15 @@ final class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
           }
           break;
         }
+      case "getFocusState":
+        {
+          try {
+            camera.getFocusState(result);
+          } catch (Exception e) {
+            handleException(e, result);
+          }
+          break;
+        }
       case "startImageStream":
         {
           try {

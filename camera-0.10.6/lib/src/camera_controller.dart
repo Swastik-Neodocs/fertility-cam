@@ -838,6 +838,18 @@ class CameraController extends ValueNotifier<CameraValue> {
     }
   }
 
+  /// Retrieves the focus state of the camera
+  ///
+  /// Returns the retrieved focus state along with isFocused boolean
+  Future<String> getFocusState() async {
+    _throwIfNotInitialized('getFocusState');
+    try {
+      return CameraPlatform.instance.getFocusState(_cameraId);
+    } on PlatformException catch (e) {
+      throw CameraException(e.code, e.message);
+    }
+  }
+
   /// Releases the resources of this camera.
   @override
   Future<void> dispose() async {

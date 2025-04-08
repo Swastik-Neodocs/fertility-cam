@@ -454,6 +454,18 @@ class AndroidCamera extends CameraPlatform {
   }
 
   @override
+  Future<String> getFocusState(int cameraId) async {
+    final String? focusState = await _channel.invokeMethod<String>(
+      'getFocusState',
+      <String, dynamic>{
+        'cameraId': cameraId,
+      },
+    );
+
+    return focusState!;
+  }
+
+  @override
   Future<double> getMaxZoomLevel(int cameraId) async {
     final double? maxZoomLevel = await _channel.invokeMethod<double>(
       'getMaxZoomLevel',

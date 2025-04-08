@@ -101,6 +101,9 @@ class FakeController extends ValueNotifier<CameraValue> implements CameraControl
   Future<void> setFocusPoint(Offset? point) async {}
 
   @override
+  Future<String> getFocusState() async => "";
+
+  @override
   Future<void> setZoomLevel(double zoom) async {}
 
   @override
